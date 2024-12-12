@@ -1,113 +1,262 @@
-import Image from 'next/image'
+// src/app/page.tsx
+'use client';
+
+import React, { useState } from 'react';
+import BubbleSort from '@/components/algorithms/sorting/BubbleSort';
+import InsertionSort from '@/components/algorithms/sorting/InsertionSort';
+import SelectionSort from '@/components/algorithms/sorting/SelectionSort';
+import ShellSort from '@/components/algorithms/sorting/ShellSort';
+import QuickSort from '@/components/algorithms/sorting/QuickSort';
+import OddNumbers from '@/components/algorithms/number-theory/OddNumbers';
+import PrimeComposite from '@/components/algorithms/number-theory/PrimeComposite';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { motion, AnimatePresence } from "framer-motion";
+import { Clock, Box } from "lucide-react";
+import '@/styles/custom.css';
+
+type AlgorithmType = 'odd' | 'prime' | 'bubble' | 'insertion' | 'selection' | 'shell' | 'quick';
+
+interface AlgorithmInfo {
+  title: string;
+  description: string;
+  category: 'Number Theory' | 'Sorting';
+  timeComplexity: {
+    best: string;
+    average: string;
+    worst: string;
+  };
+  spaceComplexity: string;
+}
+
+const algorithmInfo: Record<AlgorithmType, AlgorithmInfo> = {
+  odd: {
+    title: "Odd Numbers",
+    description: "Find odd numbers in a sequence by checking if each number is not divisible by 2.",
+    category: "Number Theory",
+    timeComplexity: {
+      best: "O(n)",
+      average: "O(n)",
+      worst: "O(n)"
+    },
+    spaceComplexity: "O(1)"
+  },
+  prime: {
+    title: "Prime & Composite",
+    description: "Identify prime numbers in a sequence. Prime numbers are only divisible by 1 and themselves.",
+    category: "Number Theory",
+    timeComplexity: {
+      best: "O(n√n)",
+      average: "O(n√n)",
+      worst: "O(n√n)"
+    },
+    spaceComplexity: "O(1)"
+  },
+  bubble: {
+    title: "Bubble Sort",
+    description: "Repeatedly steps through the list, compares adjacent elements and swaps them if needed.",
+    category: "Sorting",
+    timeComplexity: {
+      best: "O(n)",
+      average: "O(n²)",
+      worst: "O(n²)"
+    },
+    spaceComplexity: "O(1)"
+  },
+  insertion: {
+    title: "Insertion Sort",
+    description: "Builds the sorted array one item at a time, similar to sorting playing cards in hands.",
+    category: "Sorting",
+    timeComplexity: {
+      best: "O(n)",
+      average: "O(n²)",
+      worst: "O(n²)"
+    },
+    spaceComplexity: "O(1)"
+  },
+  selection: {
+    title: "Selection Sort",
+    description: "Divides array into sorted and unsorted regions, selects smallest element from unsorted region.",
+    category: "Sorting",
+    timeComplexity: {
+      best: "O(n²)",
+      average: "O(n²)",
+      worst: "O(n²)"
+    },
+    spaceComplexity: "O(1)"
+  },
+  shell: {
+    title: "Shell Sort",
+    description: "Improves insertion sort by comparing elements separated by a gap, reducing the gap gradually.",
+    category: "Sorting",
+    timeComplexity: {
+      best: "O(n log n)",
+      average: "O(n log n)",
+      worst: "O(n²)"
+    },
+    spaceComplexity: "O(1)"
+  },
+  quick: {
+    title: "Quick Sort",
+    description: "Uses divide-and-conquer, picks a pivot element and partitions other elements into subarrays.",
+    category: "Sorting",
+    timeComplexity: {
+      best: "O(n log n)",
+      average: "O(n log n)",
+      worst: "O(n²)"
+    },
+    spaceComplexity: "O(log n)"
+  }
+};
+
+const pageTransition = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 }
+};
 
 export default function Home() {
+  const [selectedTab, setSelectedTab] = useState<AlgorithmType | null>(null);
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="min-h-screen bg-[#0a0a1f] text-white">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl font-bold text-white mb-4">
+            Algorithm Vision Lab
+          </h1>
+          <p className="text-lg text-gray-300">
+            Explore and understand algorithms through interactive visualization
+          </p>
+        </motion.div>
+
+        <Tabs 
+          value={selectedTab ?? ""} 
+          onValueChange={(value) => setSelectedTab(value as AlgorithmType)}
+          className="space-y-8"
+        >
+          <motion.div 
+            layout
+            className="bg-[#1a1a3f] p-6 rounded-2xl border border-purple-500/20"
           >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+            <p className="text-sm text-gray-300 mb-4 uppercase tracking-widest font-medium">
+              Select Algorithm
+            </p>
+            <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 bg-[#0a0a1f]/50 p-2 rounded-xl">
+              {Object.entries(algorithmInfo).map(([key, info]) => (
+                <TabsTrigger 
+                  key={key} 
+                  value={key}
+                  className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-white
+                           data-[state=active]:shadow-purple-500/20 data-[state=active]:border-purple-500/50
+                           border border-transparent hover:border-purple-500/30
+                           transition-all duration-200 rounded-lg"
+                >
+                  {info.title}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </motion.div>
+
+          {!selectedTab ? (
+            <motion.div 
+              {...pageTransition}
+              className="bg-[#1a1a3f] p-8 rounded-2xl border border-purple-500/20
+                        flex items-center justify-center min-h-[300px]"
+            >
+              <div className="text-center max-w-2xl mx-auto">
+                <h2 className="text-3xl font-bold text-white mb-6">
+                  Welcome to Algorithm Vision Lab!
+                </h2>
+                <p className="text-lg text-gray-300 leading-relaxed">
+                  Choose an algorithm from above to begin your learning journey. 
+                  Watch how algorithms work step by step, control the visualization speed, 
+                  and input your own data to test different scenarios.
+                </p>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div 
+              {...pageTransition}
+              className="space-y-6"
+            >
+              <div className="bg-[#1a1a3f] p-6 rounded-2xl border border-purple-500/20">
+                <div className="text-sm font-medium text-gray-300 mb-2 uppercase tracking-widest">
+                  {algorithmInfo[selectedTab].category}
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-3">
+                  {algorithmInfo[selectedTab].title}
+                </h2>
+                <Separator className="my-4 bg-purple-500/20" />
+                <p className="text-gray-300 leading-relaxed mb-4">
+                  {algorithmInfo[selectedTab].description}
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-purple-400" />
+                      <span className="text-sm font-medium text-purple-400">Time Complexity</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-sm">
+                      <div>
+                        <span className="text-gray-400">Best: </span>
+                        <span className="text-white">{algorithmInfo[selectedTab].timeComplexity.best}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Average: </span>
+                        <span className="text-white">{algorithmInfo[selectedTab].timeComplexity.average}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Worst: </span>
+                        <span className="text-white">{algorithmInfo[selectedTab].timeComplexity.worst}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Box className="w-4 h-4 text-purple-400" />
+                      <span className="text-sm font-medium text-purple-400">Space Complexity</span>
+                    </div>
+                    <div className="text-sm">
+                      <span className="text-gray-400">Auxiliary Space: </span>
+                      <span className="text-white">{algorithmInfo[selectedTab].spaceComplexity}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <TabsContent value="odd">
+                <OddNumbers />
+              </TabsContent>
+              <TabsContent value="prime">
+                <PrimeComposite />
+              </TabsContent>
+              <TabsContent value="bubble">
+                <BubbleSort />
+              </TabsContent>
+              <TabsContent value="insertion">
+                <InsertionSort />
+              </TabsContent>
+              <TabsContent value="selection">
+                <SelectionSort />
+              </TabsContent>
+              <TabsContent value="shell">
+                <ShellSort />
+              </TabsContent>
+              <TabsContent value="quick">
+                <QuickSort />
+              </TabsContent>
+            </motion.div>
+          )}
+        </Tabs>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    </div>
+  );
 }

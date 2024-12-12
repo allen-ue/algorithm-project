@@ -1,5 +1,3 @@
-// src/components/algorithms/sorting/ShellSort.tsx
-
 import React from 'react';
 import BaseAlgorithm from '@/components/algorithms/BaseAlgorithm';
 import { AlgorithmStep } from '@/types/algorithms';
@@ -17,8 +15,9 @@ const ShellSort: React.FC = () => {
     }
     
     for (let gap of gaps) {
+      // Instead of 'select', we'll use 'comparison' to highlight the current gap
       steps.push({
-        type: 'select',
+        type: 'comparison',
         indices: [],
         description: `Starting pass with gap of ${gap}`
       });
@@ -27,8 +26,9 @@ const ShellSort: React.FC = () => {
         const temp = array[i];
         let j = i;
         
+        // Changed from 'select' to 'comparison'
         steps.push({
-          type: 'select',
+          type: 'comparison',
           indices: [i],
           description: `Selected ${temp} to compare with elements at gap ${gap}`
         });
@@ -50,12 +50,14 @@ const ShellSort: React.FC = () => {
           j -= gap;
         }
         
-        array[j] = temp;
-        steps.push({
-          type: 'final',
-          indices: [j],
-          description: `Placed ${temp} at position ${j}`
-        });
+        if (j !== i) {
+          array[j] = temp;
+          steps.push({
+            type: 'swap',
+            indices: [j],
+            description: `Placed ${temp} at position ${j}`
+          });
+        }
       }
     }
     
